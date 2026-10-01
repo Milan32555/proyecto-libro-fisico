@@ -1,36 +1,50 @@
-# Proyecto Librería: Cliente + Microservicio GraphQL
+# Proyecto Librería: Cliente + Servicio GraphQL
 
-Este repositorio contiene una solución completa para la gestión de libros físicos en una librería. Está compuesto por dos partes:
+Este repositorio contiene dos proyectos que trabajan juntos para gestionar libros físicos:
 
-- Un cliente de escritorio en C# con Windows Forms: `ClienteLibroFisico`
-- Un microservicio desarrollado en Java/Spring Boot con GraphQL: `ServicioLibroFisico-master`
+- Cliente de escritorio en C# y Windows Forms: `ClienteLibroFisico`
+- Microservicio backend en Java con Spring Boot y GraphQL: `ServicioLibroFisico-master`
 
-La arquitectura está dividida en dos capas:
-
-1. El cliente consume las operaciones del servidor GraphQL.
-2. El servidor expone los servicios y maneja la lógica de negocio y validaciones.
+El cliente no guarda datos localmente; toda la información se maneja a través del backend en `http://localhost:8081/graphql`.
 
 ---
 
-## 1. Descripción general
+## 1. Objetivo del proyecto
 
-La aplicación permite administrar libros físicos con acciones como:
+La aplicación permite:
 
-- Insertar libro
-- Consultar libro por ISBN
-- Actualizar libro
-- Eliminar libro
-- Listar libros
-- Filtrar por autor y tipo de tapa
-
-El cliente se conecta al servicio GraphQL que corre en `http://localhost:8081/graphql`.
+- Insertar libros físicos
+- Consultar un libro por ISBN
+- Actualizar información del libro
+- Eliminar un libro
+- Listar todos los libros
+- Filtrar por autor y por tipo de tapa
 
 ---
 
-## 2. Estructura del proyecto
+## 2. Requisitos previos
+
+### Para el backend (Java / Spring Boot)
+
+- Java 17
+- Maven (o usar el wrapper incluido `mvnw` / `mvnw.cmd`)
+- Internet para descargar dependencias la primera vez
+
+### Para el cliente (C# / Windows Forms)
+
+- Windows 10 o 11
+- .NET Framework 4.8
+- Visual Studio 2022 Community o Build Tools
+
+> Si no se tiene Visual Studio, se puede compilar con MSBuild desde la terminal, pero lo más recomendado es abrir la solución con Visual Studio.
+
+---
+
+## 3. Estructura del repositorio
 
 ```text
 Proyecto/
+├── README.md
 ├── ClienteLibroFisico/
 │   ├── ClienteLibroFisico.sln
 │   ├── ClienteLibroFisico/
@@ -38,119 +52,186 @@ Proyecto/
 │   │   ├── Servicios/
 │   │   ├── Vistas/
 │   │   ├── Program.cs
-│   │   └── App.config
+│   │   ├── App.config
+│   │   └── ...
 │   └── README.md
 │
-├── ServicioLibroFisico-master/
-│   ├── pom.xml
-│   ├── mvnw
-│   ├── src/
-│   └── target/
-│
-└── README.md
+└── ServicioLibroFisico-master/
+    ├── pom.xml
+    ├── mvnw
+    ├── mvnw.cmd
+    ├── src/
+    └── target/
 ```
 
 ---
 
-## 3. Requisitos
+## 4. Paso a paso para ejecutar el proyecto
 
-### Cliente .NET
+## 4.1 Iniciar el backend
 
-- Windows 10 o 11
-- .NET Framework 4.8
-- Visual Studio 2022 o Visual Studio Build Tools
+1. Abrir una terminal en la carpeta `ServicioLibroFisico-master`.
+2. Ejecutar:
 
-### Servidor Java
-
-- Java 17
-- Maven
-- Spring Boot 4.1.1
-
----
-
-## 4. Cómo ejecutar el proyecto
-
-### 4.1 Ejecutar el microservicio
-
-Abre una terminal en la carpeta `ServicioLibroFisico-master` y ejecuta:
+### En Linux / macOS
 
 ```bash
 ./mvnw clean package
 ./mvnw spring-boot:run
 ```
 
-En Windows PowerShell:
+### En Windows PowerShell
 
 ```powershell
+cd .\ServicioLibroFisico-master
 mvnw.cmd clean package
 mvnw.cmd spring-boot:run
 ```
 
-El servicio quedará disponible en:
+3. Esperar a que Spring Boot termine de iniciar.
+4. Verificar que el servicio esté activo en:
 
 ```text
 http://localhost:8081/graphql
 ```
 
-También puede habilitarse GraphiQL desde la configuración del proyecto.
+5. También queda habilitado GraphiQL en la misma URL, si el navegador lo permite.
 
-### 4.2 Ejecutar el cliente
+> Si no aparece ninguna respuesta, revisar que Java 17 esté instalado y que el puerto 8081 no esté ocupado.
 
-Abre la solución:
+---
+
+## 4.2 Verificar que el servicio responde
+
+Desde el navegador o una herramienta como Postman, puede probar esta URL:
+
+```text
+http://localhost:8081/graphql
+```
+
+Si el backend está bien levantado, la API GraphQL estará lista para recibir consultas y mutaciones.
+
+---
+
+## 4.3 Ejecutar el cliente Windows Forms
+
+1. Abrir la solución:
 
 ```text
 ClienteLibroFisico/ClienteLibroFisico.sln
 ```
 
-Compila y ejecuta la aplicación desde Visual Studio.
+2. Cargar el proyecto en Visual Studio 2022.
+3. Esperar a que restaure los paquetes NuGet.
+4. Presionar `F5` para ejecutar la aplicación.
 
-> Asegúrate de que el servidor esté levantado antes de usar las operaciones del cliente.
+### Si se quiere compilar desde consola
 
----
+```powershell
+$msbuild = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -find MSBuild\**\Bin\MSBuild.exe
+& $msbuild "ClienteLibroFisico\ClienteLibroFisico.sln" -t:restore -p:RestorePackagesConfig=true
+& $msbuild "ClienteLibroFisico\ClienteLibroFisico.sln"
+```
 
-## 5. Tecnologías usadas
+Luego ejecutar:
 
-### Cliente
-
-- C#
-- Windows Forms
-- .NET Framework 4.8
-- GraphQL.Client
-- System.Text.Json
-
-### Servidor
-
-- Java 17
-- Spring Boot 4
-- Spring GraphQL
-- Maven
-- Lombok
+```powershell
+\ClienteLibroFisico\ClienteLibroFisico\bin\Debug\ClienteLibroFisico.exe
+```
 
 ---
 
-## 6. Funcionalidades principales
+## 5. Importante: orden correcto de ejecución
 
-- Registrar libros con información completa
-- Validar ISBN, título, autor, precio y fechas
-- Consultar libros por ISBN
-- Actualizar información de un libro existente
-- Eliminar libros con confirmación
-- Listar todos los libros
-- Filtrar libros por autor o tipo de tapa
+Para que la aplicación funcione correctamente, siempre se debe ejecutar en este orden:
+
+1. Levantar el backend Java
+2. Esperar a que esté en `http://localhost:8081/graphql`
+3. Abrir el cliente C#
+4. Usar las funcionalidades del menú
+
+Si el backend no está activo, el cliente mostrará que no puede conectarse al servidor.
 
 ---
 
-## 7. Nota importante
+## 6. Configuración del servidor en el cliente
 
-El cliente está diseñado para consumir el microservicio en localhost. Si el servidor cambia de puerto o dirección, debe ajustarse en:
+La URL del backend está definida en:
 
 ```text
 ClienteLibroFisico/ClienteLibroFisico/Servicios/LibroFisicoService.cs
 ```
 
+Constante:
+
+```csharp
+public const string URL_SERVIDOR = "http://localhost:8081/graphql";
+```
+
+Si cambias el puerto o la dirección del backend, debes actualizar esa constante en el cliente.
+
 ---
 
-## 8. Autoría
+## 7. Funcionalidades disponibles
+
+El cliente ofrece estas operaciones:
+
+- Insertar libro
+- Consultar libro por ISBN
+- Actualizar un libro
+- Eliminar un libro
+- Listar todos los libros
+- Filtrar por autor y/o tipo de tapa
+
+---
+
+## 8. Tecnologías usadas
+
+### Backend
+
+- Java 17
+- Spring Boot 4.1.1
+- Spring GraphQL
+- Maven
+- Lombok
+
+### Frontend
+
+- C#
+- .NET Framework 4.8
+- Windows Forms
+- GraphQL.Client
+- System.Text.Json
+
+---
+
+## 9. Solución de problemas comunes
+
+### Error: no se puede conectar al servidor
+
+- Verifica que el backend esté ejecutándose
+- Revisa la URL `http://localhost:8081/graphql`
+- Confirma que el puerto 8081 no está ocupado por otra aplicación
+
+### Error: Java no encontrado
+
+Instala Java 17 y verifica con:
+
+```powershell
+java -version
+```
+
+### Error: Visual Studio no restaura paquetes
+
+Reinicia Visual Studio y vuelve a abrir la solución, o ejecuta la restauración desde la opción de NuGet.
+
+### Error: no compila por .NET Framework
+
+Instala el .NET Framework 4.8 o usa una máquina con Windows con el SDK de Visual Studio configurado correctamente.
+
+---
+
+## 10. Creditos
 
 Proyecto académico desarrollado para la asignatura de Diseño de Soluciones.
 
@@ -163,6 +244,6 @@ Integrantes:
 
 ---
 
-## 9. Licencia
+## 11. Nota final
 
-Este proyecto es de uso académico y está destinado a fines educativos dentro de la universidad.
+Para que el proyecto funcione correctamente, hay que levantar primero el backend y luego abrir el cliente. Si se sigue ese orden, la aplicación puede ejecutarse de forma estable y conectarse al servicio GraphQL sin problemas.
