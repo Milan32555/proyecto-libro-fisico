@@ -1,0 +1,30 @@
+# Visual Studio / .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+*.pdb
+*.exe
+*.dll
+packages/
+*.nupkg
+
+# Java / Maven
+**/target/
+**/.classpath
+**/.project
+**/.settings/
+**/.idea/
+**/*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+
+# Logs
+*.log

@@ -1,0 +1,54 @@
+
+scalar LocalDateTime
+
+enum TipoTapa {
+    BLANDA
+    DURA
+}
+
+type LibroFisico {
+    isbn: ID!
+    titulo: String!
+    autor: String!
+    precio: Float!
+    numeroPaginas: Int!
+    fechaImpresion: LocalDateTime!
+    tipoTapa: TipoTapa!
+    "Precio + 10 % si es tapa dura"
+    totalPagar: Float!
+}
+
+input LibroFisicoInput {
+    isbn: ID!
+    titulo: String!
+    autor: String!
+    precio: Float!
+    numeroPaginas: Int!
+    fechaImpresion: LocalDateTime!
+    tipoTapa: TipoTapa!
+}
+
+input LibroFisicoUpdateInput {
+    titulo: String!
+    autor: String!
+    precio: Float!
+    numeroPaginas: Int!
+    fechaImpresion: LocalDateTime!
+    tipoTapa: TipoTapa!
+}
+
+type Query {
+    "Listar todos los libros físicos"
+    librosFisicos: [LibroFisico!]!
+    "Listar filtrando del lado del servidor por autor (parcial) y/o tipo de tapa"
+    librosFisicosFiltrados(autor: String, tipoTapa: TipoTapa): [LibroFisico!]!
+    "Consultar un solo libro físico por su ISBN"
+    libroFisicoPorIsbn(isbn: ID!): LibroFisico
+}
+
+type Mutation {
+    crearLibroFisico(input: LibroFisicoInput!): LibroFisico
+    actualizarLibroFisico(isbn: ID!, input: LibroFisicoUpdateInput!): LibroFisico
+    "Elimina el libro y devuelve los datos del libro eliminado"
+    eliminarLibroFisico(isbn: ID!): LibroFisico
+}
